@@ -1,0 +1,48 @@
+{% load static %}
+<section id="result">
+    <div class="container">
+        <div class="result p100">
+            <div class="result__block ficb">
+                <div class="result__elems">
+                    <div class="card__elems ">
+                        <span class="card__elems_intro">Описание:</span>
+                        <div class="card__items">
+                            {% if bouquet.first_description %}
+                                <p class="card__items_text card__items_text__first">{{ bouquet.first_description }}</p>
+                            {% endif %}
+                            {% if last_description %}
+                                <p class="card__items_text">{{ bouquet.last_description }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card__elems ">
+                        <span class="card__elems_intro">Состав:</span>
+                        <div class="card__items">
+                            <p class="card__items_text card__items_text__first">{{flowers_display}}</p>
+                        </div>
+                    </div>
+                </div>
+                    <img src="{{ bouquet.image.url }}" alt="{{ bouquet.name }}" class="result__block_img">
+                <div class="result__items">
+                    <div class="title result__items_title">{{ bouquet.name }}</div>
+                    <div class="result__items_price">{{ bouquet.price }} руб.</div>
+
+                    <a class="my_a" href="{% url 'core:order_step_delivery' bouquet.id %}">
+                        <button class="btn result__items_btn">Заказать букет</button>
+                    </a>
+
+                    <hr class="result__items_line"/>
+                    <div class="result__items_intro">Хотите что-то более специальное?</div>
+                    <div class="result__items_block">
+                        <a class="my_a" href="{% url 'core:catalog_collect' bouquet.id %}">
+                            <button class="btn largeBtn result__items_block__btn my_a">Смотреть всю коллекцию</button>
+                        </a>
+                        <a href="{% url 'core:consultation' %}">
+                            <button class="btn largeBtn result__items_block__btn">Заказать консультацию</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

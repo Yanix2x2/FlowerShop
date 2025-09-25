@@ -1,0 +1,27 @@
+{% load static %}
+<section id="recommended">
+    <div class="container">
+        <div class="recommended p100">
+            <div class="title">Рекомендуем</div>
+            <div class="recommended__elems ficb">
+                <div class="catalog__block wrapper-boxes">
+                    {% for bouquet in bouquets %}
+                        <div class="image-block box">
+                            <a href="{% url 'core:bouquet_item' bouquet.id %}" class="image-block">
+                                <img src="{{ bouquet.image.url }}" alt="{{ bouquet.name }}">
+                                <div class="text-overlay">
+                                    <span class="left-text">{{ bouquet.name }}</span>
+                                    <span class="right-text">{{ bouquet.price }} руб.</span>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                    <button id="showMoreButton" class="btn largeBtn catalog__btn">Показать ещё</button>
+                </div>
+            </div>
+            <a class="my_a" href="{% url 'core:catalog' %}">
+                <button class="btn recommended__btn">Показать всю коллекцию</button>
+            </a>
+        </div>
+    </div>
+</section>

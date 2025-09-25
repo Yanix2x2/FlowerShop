@@ -1,0 +1,22 @@
+{% load static %}
+<section id="catalog">
+    <div class="container p100">
+        <div class="catalog">
+            <div class="title">Все букеты</div>
+            <div class="catalog__block wrapper-boxes">
+                {% for bouquet in bouquets %}
+                        <div class="image-block box">
+                            <a href="{% url 'core:bouquet_item' bouquet.id %}" class="image-block">
+                              <img src="{{ bouquet.image.url }}" alt="{{ bouquet.name }}">
+                              <div class="text-overlay">
+                                <span class="left-text">{{ bouquet.name }}</span>
+                                <span class="right-text">{{ bouquet.price }} руб.</span>
+                              </div>
+                            </a>
+                        </div>
+                {% endfor %}
+                <button id="showMoreButton" class="btn largeBtn catalog__btn">Показать ещё</button>
+            </div>
+        </div>
+    </div>
+</section>
