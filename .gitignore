@@ -1,4 +1,6 @@
 .DS_Store
+/db
+/flower_store/staticfiles
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
