@@ -6,6 +6,7 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include(('core.urls', 'core'), namespace='core')),
+    path("payments/", include(('payments.urls', 'payments'), namespace='payments')),
 ]
 
 if settings.DEBUG:

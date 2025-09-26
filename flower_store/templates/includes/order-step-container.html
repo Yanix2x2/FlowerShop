@@ -5,30 +5,12 @@
             <div class="order__block">
                 <div class="order_items">
                     <div class="title">Оплата</div>
-                    <form action="#" class="order__form orderStep_form">
-                        <div class="order__form_block">
-                            <div class="order__form_items">
-                                <div class="order__form_intro">номер карты</div>
-                                <input type="text" name="cardNum" class="order__form_input orderStep_form_input" placeholder="Введите номер" required>
-                                <div class="order__form_item fic">
-                                    <input type="text" name="cardMm" class="order__form_input orderStep_form_input" placeholder="ММ" required>
-                                    <input type="text" name="cardGg" class="order__form_input orderStep_form_input" placeholder="ГГ" required>
-                                </div>
-                                
-                                <input type="text" name="cardFname" class="order__form_input orderStep_form_input" placeholder="Имя владельца" required>
-                                <input type="text" name="cardCvc" class="order__form_input orderStep_form_input" placeholder="CVC" required>
-                            </div>
-                            <div class="order__form_items">
-                                <div class="order__form_intro">Ваш e-mail (необязательно)</div>
-                                <input type="email" name="mail" class="order__form_input orderStep_form_input" placeholder="pochta@mail.ru">
-                            </div>
-                        </div>
-                        <div class="order__form_line"></div>
+                    <div class="order__form orderStep_form">
                         <div class="order__form_btns ficb">
-                            <button class="btn order__form_pay">Оплатить</button>
+                            <button type="button" class="btn order__form_pay">Оплатить</button>
                             <button class="btn order__form_btn">Назад</button>
                         </div>
-                    </form>
+                    </div>
                 </div>
                 <!-- <div class="blockImgHiden"></div> -->
             </div>
@@ -36,4 +18,45 @@
     </div>
     <img src="img/orderImg.jpg" alt="orderImg" class="order__img">
 </section>
-	
+<script src="https://widget.cloudpayments.ru/bundles/cloudpayments"></script>
+<script>
+(function () {
+    var payBtn = document.querySelector('.order__form_pay');
+    if (!payBtn) { return; }
+
+    function normalizeAmount(s) {
+        s = String(s).replace(/\s/g, '').replace(',', '.');
+        var n = Number(s);
+        return Number.isFinite(n) ? n : null;
+    }
+
+    payBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (!window.cp || !cp.CloudPayments) {
+            alert('Не удалось загрузить виджет CloudPayments. Проверьте блокировщики и CSP.');
+            return;
+        }
+
+        var amount = normalizeAmount("{{ amount }}") ?? 10.00;
+        var widget = new cp.CloudPayments();
+        try {
+            widget.pay('auth', {
+                publicId: "{{ PUBLIC_ID|default:'test_api_00000000000000000000001' }}",
+                description: "Оплата букета #{{ bouquet_id }} (демо)",
+                amount: amount,
+                currency: "RUB",
+                accountId: "demo-user@example.com",
+                invoiceId: "order-{{ order_id|default:'demo' }}",
+                skin: "mini"
+            }, function () {
+                const q = new URLSearchParams({order_id: "{{ order_id|default:'' }}"}).toString();
+                window.location.href = "{% url 'payments:success' %}" + (q ? ("?"+q) : "");
+            }, function () {
+                window.location.href = "{% url 'payments:fail' %}";
+            });
+        } catch (err) {
+            alert('Ошибка запуска виджета CloudPayments: ' + err.message);
+        }
+    });
+})();
+</script>

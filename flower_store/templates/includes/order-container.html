@@ -5,7 +5,7 @@
             <div class="order__block">
                 <div class="order_items">
                     <div class="title">Оформление доставки</div>
-                    <form action="#" class="order__form">
+                    <form action="{% url 'core:order_step_delivery' bouquet_id %}" method="post" class="order__form">
                         {% csrf_token %}
                         <div class="order__form_block ficb">
                             <input type="text" name="customer_name" class="order__form_input" placeholder="Введите Имя" required>
@@ -41,8 +41,8 @@
                         </div>
                         <div class="order__form_line"></div>
                         <div class="order__form_btns ficb">
-                            <button class="btn order__form_pay">Оплатить</button>
-                            <button class="btn order__form_btn">Назад</button>
+                            <button type="submit" class="btn order__form_pay">Оплатить</button>
+                            <button type="button" class="btn order__form_btn">Назад</button>
                         </div>
                     </form>
                 </div>
