@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
 
 from .forms import ConsultationRequest
-from .models import Product
+from .models import Product, Order
 
 
 def index(request):
@@ -71,8 +73,28 @@ def catalog_collect(request, bouquet_id):
 
 
 def order_step_delivery(request, bouquet_id):
+    if request.method == 'POST':
+        customer_name = request.POST.get('customer_name')
+        customer_phone = request.POST.get('customer_phone')
+        delivery_address = request.POST.get('delivery_address')
+        order_time = request.POST.get('orderTime')
 
-    return render(request, 'order.html')
+        product = Product.objects.get(pk=bouquet_id)
+        order = Order.objects.create(
+            customer_name=customer_name,
+            customer_phone=customer_phone,
+            delivery_address=delivery_address,
+            delivery_date=timezone.now().date(),
+            comment=order_time or "",
+            product=product,
+            quantity=1,
+        )
+
+        pay_url = reverse("payments:pay", args=[bouquet_id])
+        amount = order.total_price
+        return redirect(f"{pay_url}?order_id={order.id}&amount={amount}")
+
+    return render(request, 'order.html', {'bouquet_id': bouquet_id})
 
 
 def consultation(request):
@@ -87,4 +109,3 @@ def consultation(request):
 
 def result(request):
     return render(request, 'result.html')
-
