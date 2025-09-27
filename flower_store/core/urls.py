@@ -12,4 +12,5 @@ urlpatterns = [
     path('consultation/', views.consultation, name='consultation'),
     path('catalog-collect/<int:bouquet_id>/', views.catalog_collect, name='catalog_collect'),
     path('order_step_delivery/<int:bouquet_id>/', views.order_step_delivery, name='order_step_delivery'),
+    path('quiz-step/', views.quiz_step, name='quiz_step'),
 ]

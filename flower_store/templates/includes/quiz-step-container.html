@@ -1,31 +1,48 @@
 {% load static %}
-<section id="quiz">
+<section id="quiz" style="min-height: 80vh; padding: 50px 0;">
     <div class="container">
         <div class="quiz">
-            <div class="quiz__back ">
-                <a href="#" class="quiz__back_link fic"><img src="img/arrow-left.svg" alt="arrow-left" class="arrowLeft">
-                <span class="quiz__back_intro">Назад</span></a>
+            <div class="quiz__back">
+                <a href="{% url 'core:index' %}" class="quiz__back_link fic">
+                    <img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">
+                    <span class="quiz__back_intro">Назад</span>
+                </a>
             </div>
-            <div class="quiz__block">
-                <h1 class="quiz__title">На какой бюджет рассчитываете?</h1>
-                <div class="quiz__elems fic">
-                    <button class="quiz__elem">До 1 000 руб</button>
-                    <button class="quiz__elem">1 000 - 5 000 руб</button>
-                    <button class="quiz__elem">от 5 000 руб</button>
-                    <button class="quiz__elem">Не имеет значения</button>
-                </div>
-                <div class="quiz__progress">
+            <div class="quiz__block" style="margin: 50px 0;">
+                <h1 class="quiz__title" style="margin-bottom: 40px;">{{ title }}</h1>
+                
+                {% if step == 1 %}
+                    <form method="post" action="{% url 'core:quiz_step' %}">
+                        {% csrf_token %}
+                        <div class="quiz__elems fic">
+                            <button type="submit" name="occasion" value="Свадьба" class="quiz__elem">Свадьба</button>
+                            <button type="submit" name="occasion" value="День рождения" class="quiz__elem">День рождения</button>
+                            <button type="submit" name="occasion" value="Без повода" class="quiz__elem">Без повода</button>
+                        </div>
+                    </form>
+                {% elif step == 2 %}
+                    <form method="post" action="{% url 'core:quiz_step' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="occasion" value="{{ occasion }}">
+                        <div class="quiz__elems fic">
+                            <button type="submit" name="price_range" value="low" class="quiz__elem">До 1 000 руб.</button>
+                            <button type="submit" name="price_range" value="medium" class="quiz__elem">1 000 - 5 000 руб.</button>
+                            <button type="submit" name="price_range" value="high" class="quiz__elem">От 5 000 руб.</button>
+                        </div>
+                    </form>
+                {% endif %}
+                
+                <div class="quiz__progress" style="margin-top: 60px;">
                     <div class="quiz__progress_step">
-                        <span class="quiz__progress_num">1</span>
+                        <span class="quiz__progress_num">{{ step|default:1 }}</span>
                         <span class="quiz__progress_in"> шаг из </span>
                         <span class="quiz__progress_num">2</span>
                     </div>
                     <div class="quiz__progress_line">
-                        <div class="quiz__progress_lineActive"></div>
+                        <div class="quiz__progress_lineActive" style="width: {% if step == 1 %}50{% else %}100{% endif %}%"></div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
