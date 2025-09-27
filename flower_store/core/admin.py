@@ -105,24 +105,24 @@ class FlowerAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'id', 'customer_name', 'customer_phone', 'product',
-        'quantity', 'total_price', 'status', 'created_at'
+        'quantity', 'total_price', 'status', 'created_at', 'delivery_time'
     ]
     list_filter = ['status', 'delivery_date', 'created_at']
     search_fields = ['customer_name', 'customer_phone', 'delivery_address']
-    readonly_fields = ['created_at', 'total_price', 'delivered_at']
-    list_editable = ['status']
+    readonly_fields = ['created_at', 'total_price',]
+    list_editable = ['status', 'delivery_time']
     fieldsets = (
         ('Информация о клиенте', {
             'fields': ('customer_name', 'customer_phone', 'customer_email')
         }),
         ('Доставка', {
-            'fields': ('delivery_address', 'delivery_date', 'courier')
+            'fields': ('delivery_address', 'delivery_date', 'delivery_time', 'courier')
         }),
         ('Заказ', {
             'fields': ('product', 'quantity', 'total_price', 'status')
         }),
         ('Дополнительно', {
-            'fields': ('comment', 'created_at', 'delivered_at')
+            'fields': ('comment', 'created_at')
         }),
     )
 
