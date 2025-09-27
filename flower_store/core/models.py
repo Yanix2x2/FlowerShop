@@ -196,12 +196,28 @@ class Order(models.Model):
         blank=True,
         verbose_name='Email клиента'
     )
-
     delivery_address = models.TextField(
         verbose_name='Адрес доставки'
     )
     delivery_date = models.DateField(
         verbose_name='Дата доставки'
+    )
+    CHOICE = (
+        ('AM', '11:00 - 15:00'),
+        ('PM', '15:00 - 20:00'),
+    )
+    delivery_time = models.CharField(
+        verbose_name='Время доставки',
+        max_length=20,
+        choices=CHOICE,
+        default='AM')
+    courier = models.ForeignKey(
+        Courier,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Курьер',
+        related_name='orders'
     )
     comment = models.TextField(
         blank=True,
@@ -230,19 +246,6 @@ class Order(models.Model):
         default=OrderStatus.NEW,
         verbose_name='Статус заказа'
     )
-    courier = models.ForeignKey(
-        Courier,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name='Курьер',
-        related_name='orders'
-    )
-    delivered_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name='Дата и время доставки'
-    )
     created_at = models.DateTimeField(
         default=timezone.now,
         verbose_name='Дата создания заказа'
@@ -257,16 +260,13 @@ class Order(models.Model):
         return f"Заказ #{self.id} - {self.customer_name} ({self.status})"
 
     def calculate_total_price(self):
-        """Рассчитывает общую стоимость заказа"""
         if self.product and self.quantity:
             return self.product.price * self.quantity
         return 0
 
     def save(self, *args, **kwargs):
-        # Пересчитываем стоимость перед сохранением
         self.total_price = self.calculate_total_price()
 
-        # Автоматически устанавливаем delivered_at при доставке
         if self.status == self.OrderStatus.DELIVERED and not self.delivered_at:
             self.delivered_at = timezone.now()
         elif self.status != self.OrderStatus.DELIVERED:
@@ -276,12 +276,10 @@ class Order(models.Model):
 
     @property
     def formatted_total_price(self):
-        """Форматированная стоимость для отображения"""
         return f"{self.total_price} руб."
 
     @property
     def product_price(self):
-        """Цена одного букета (для удобства)"""
         return self.product.price if self.product else 0
 
 
