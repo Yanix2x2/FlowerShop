@@ -15,9 +15,9 @@
                     <form method="post" action="{% url 'core:quiz_step' %}">
                         {% csrf_token %}
                         <div class="quiz__elems fic">
-                            <button type="submit" name="occasion" value="Свадьба" class="quiz__elem">Свадьба</button>
-                            <button type="submit" name="occasion" value="День рождения" class="quiz__elem">День рождения</button>
-                            <button type="submit" name="occasion" value="Без повода" class="quiz__elem">Без повода</button>
+                            {% for occasion in occasions %}
+                                <button type="submit" name="occasion" value="{{ occasion.name }}" class="quiz__elem">{{ occasion.name }}</button>
+                            {% endfor %}
                         </div>
                     </form>
                 {% elif step == 2 %}

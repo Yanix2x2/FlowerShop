@@ -99,6 +99,8 @@ def order_step_delivery(request, bouquet_id):
 
 def quiz_step(request):
     """Обработка квиза"""
+    occasions = Occasion.objects.all()
+    
     if request.method == 'POST':
         occasion = request.POST.get('occasion')
         price_range = request.POST.get('price_range')
@@ -107,7 +109,8 @@ def quiz_step(request):
             return render(request, 'quiz-step.html', {
                 'step': 2,
                 'occasion': occasion,
-                'title': 'Какой у вас бюджет?'
+                'title': 'Какой у вас бюджет?',
+                'occasions': occasions
             })
 
         if occasion and price_range:
@@ -133,7 +136,8 @@ def quiz_step(request):
 
     return render(request, 'quiz-step.html', {
         'step': 1,
-        'title': 'К какому событию нужен букет?'
+        'title': 'К какому событию нужен букет?',
+        'occasions': occasions
     })
 
 
