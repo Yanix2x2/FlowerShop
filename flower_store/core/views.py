@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .forms import ConsultationRequest
-from .models import Product, Order
+from .models import Product, Order, Occasion
 
 
 def index(request):
@@ -95,6 +95,46 @@ def order_step_delivery(request, bouquet_id):
         return redirect(f"{pay_url}?order_id={order.id}&amount={amount}")
 
     return render(request, 'order.html', {'bouquet_id': bouquet_id})
+
+
+def quiz_step(request):
+    """Обработка квиза"""
+    if request.method == 'POST':
+        occasion = request.POST.get('occasion')
+        price_range = request.POST.get('price_range')
+
+        if occasion and not price_range:
+            return render(request, 'quiz-step.html', {
+                'step': 2,
+                'occasion': occasion,
+                'title': 'Какой у вас бюджет?'
+            })
+
+        if occasion and price_range:
+            bouquets = Product.objects.all()
+
+            if occasion and occasion != 'any':
+                bouquets = bouquets.filter(occasions__name__icontains=occasion)
+
+            if price_range:
+                if price_range == 'low':
+                    bouquets = bouquets.filter(price__lte=1000)
+                elif price_range == 'medium':
+                    bouquets = bouquets.filter(price__gt=1000, price__lte=5000)
+                elif price_range == 'high':
+                    bouquets = bouquets.filter(price__gt=5000)
+
+            return render(request, 'catalog.html', {
+                'bouquets': bouquets,
+                'is_quiz_result': True,
+                'selected_occasion': occasion,
+                'selected_price': price_range
+            })
+
+    return render(request, 'quiz-step.html', {
+        'step': 1,
+        'title': 'К какому событию нужен букет?'
+    })
 
 
 def consultation(request):
