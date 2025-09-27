@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from core.models import Order
 
@@ -22,7 +22,7 @@ def success(request):
     order.status = Order.OrderStatus.PAID
     order.save()
 
-    return HttpResponse(f"Успех! Заказ #{order_id} оплачен. Статус: {order.status}")
+    return redirect('core:index')
 
 
 def fail(request):

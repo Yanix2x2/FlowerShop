@@ -17,45 +17,59 @@
     </div>
     <img src="img/orderImg.jpg" alt="orderImg" class="order__img">
 </section>
-<script src="https://widget.cloudpayments.ru/bundles/cloudpayments"></script>
+<script src="https://widget.cloudpayments.ru/bundles/cloudpayments.js"></script>
 <script>
 (function () {
-    var payBtn = document.querySelector('.order__form_pay');
-    if (!payBtn) { return; }
+  const payBtn = document.querySelector('.order__form_pay');
+  if (!payBtn) return;
 
-    function normalizeAmount(s) {
-        s = String(s).replace(/\s/g, '').replace(',', '.');
-        var n = Number(s);
-        return Number.isFinite(n) ? n : null;
+  function normalizeAmount(s) {
+    s = String(s).replace(/\s/g, '').replace(',', '.');
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  payBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    if (!window.cp || !cp.CloudPayments) {
+      alert('Не удалось загрузить виджет CloudPayments. Проверьте блокировщики и CSP.');
+      return;
     }
 
-    payBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (!window.cp || !cp.CloudPayments) {
-            alert('Не удалось загрузить виджет CloudPayments. Проверьте блокировщики и CSP.');
-            return;
-        }
+    const amount = normalizeAmount("{{ amount }}") ?? 10.00;
 
-        var amount = normalizeAmount("{{ amount }}") ?? 10.00;
-        var widget = new cp.CloudPayments();
-        try {
-            widget.pay('auth', {
-                publicId: "{{ PUBLIC_ID|default:'test_api_00000000000000000000001' }}",
-                description: "Оплата букета #{{ bouquet_id }} (демо)",
-                amount: amount,
-                currency: "RUB",
-                accountId: "demo-user@example.com",
-                invoiceId: "order-{{ order_id|default:'demo' }}",
-                skin: "mini"
-            }, function () {
-                const q = new URLSearchParams({order_id: "{{ order_id|default:'' }}"}).toString();
-                window.location.href = "{% url 'payments:success' %}" + (q ? ("?"+q) : "");
-            }, function () {
-                window.location.href = "{% url 'payments:fail' %}";
-            });
-        } catch (err) {
-            alert('Ошибка запуска виджета CloudPayments: ' + err.message);
+    const widget = new cp.CloudPayments();
+    try {
+      widget.pay(
+        'charge',
+        {
+          publicId: "{{ PUBLIC_ID|default:'test_api_00000000000000000000001' }}",
+          description: "Оплата букета #{{ bouquet_id }} (демо)",
+          amount: amount,
+          currency: "RUB",
+          accountId: "demo-user@example.com",
+          invoiceId: "order-{{ order_id|default:'demo' }}",
+          skin: "mini"
+        },
+        {
+          onSuccess: function (options) {
+          },
+          onFail: function (reason, options) {
+          },
+          onComplete: function (paymentResult, options) {
+            const q = new URLSearchParams({order_id: "{{ order_id|default:'' }}"});
+            if (paymentResult && paymentResult.success === true) {
+              window.location.href = "{% url 'payments:success' %}" + (q ? ("?"+q) : "");
+            } else {
+              window.location.href = "{% url 'payments:fail' %}";
+            }
+          }
         }
-    });
+      );
+    } catch (err) {
+      alert('Ошибка запуска виджета CloudPayments: ' + err.message);
+    }
+  });
 })();
 </script>
