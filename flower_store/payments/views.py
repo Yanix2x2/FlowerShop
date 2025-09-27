@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from core.models import Order
+from core.models import Order, Courier
 
 
 def pay(request, bouquet_id: int):
@@ -20,6 +20,16 @@ def success(request):
 
     order = Order.objects.get(pk=order_id)
     order.status = Order.OrderStatus.PAID
+
+    if not order.courier:
+        from django.db.models import Count
+        free_courier = Courier.objects.annotate(
+            order_count=Count('orders')
+        ).order_by('order_count').first()
+        
+        if free_courier:
+            order.courier = free_courier
+
     order.save()
 
     return redirect('core:index')
