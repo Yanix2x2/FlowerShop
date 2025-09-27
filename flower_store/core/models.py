@@ -203,7 +203,7 @@ class Order(models.Model):
         verbose_name='Дата доставки'
     )
     CHOICE = (
-        ('any', 'Как можно скорее')
+        ('any', 'Как можно скорее'),
         ('10-12', '10:00 - 12:00'),
         ('12-14', '12:00 - 14:00'),
         ('14-16', '14:00 - 16:00'),
@@ -242,7 +242,7 @@ class Order(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0)],
         verbose_name='Общая стоимость',
-        editable=False  # Делаем поле нередактируемым в админке
+        editable=False
     )
     status = models.CharField(
         max_length=20,

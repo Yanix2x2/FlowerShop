@@ -105,7 +105,7 @@ class FlowerAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'id', 'customer_name', 'customer_phone', 'product',
-        'quantity', 'total_price', 'status', 'created_at', 'delivery_time'
+        'quantity', 'total_price', 'status', 'created_at', 'delivery_time', 'courier'
     ]
     list_filter = ['status', 'delivery_date', 'created_at']
     search_fields = ['customer_name', 'customer_phone', 'delivery_address']
