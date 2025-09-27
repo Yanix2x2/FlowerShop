@@ -203,14 +203,18 @@ class Order(models.Model):
         verbose_name='Дата доставки'
     )
     CHOICE = (
-        ('AM', '11:00 - 15:00'),
-        ('PM', '15:00 - 20:00'),
+        ('any', 'Как можно скорее')
+        ('10-12', '10:00 - 12:00'),
+        ('12-14', '12:00 - 14:00'),
+        ('14-16', '14:00 - 16:00'),
+        ('16-18', '16:00 - 18:00'),
+        ('18-20', '18:00 - 20:00'),
     )
     delivery_time = models.CharField(
         verbose_name='Время доставки',
         max_length=20,
         choices=CHOICE,
-        default='AM')
+        default='any')
     courier = models.ForeignKey(
         Courier,
         on_delete=models.SET_NULL,
