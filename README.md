@@ -80,3 +80,4 @@
 `opt/FlowerShop/flower_store/staticfiles/`
 
 `opt/FlowerShop/flower_store/media/`
++
