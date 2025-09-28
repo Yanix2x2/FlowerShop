@@ -13,7 +13,7 @@ def order_paid_handler(sender, instance: Order, created, **kwargs):
             f"🚚 Новый заказ для доставки!\n\n"
             f"Курьер: {instance.courier.name}\n\n"
             f"Адрес: {instance.delivery_address}\n"
-            f"Дата: {instance.delivery_date}, {instance.delivery_time}\n"
+            f"Дата: {instance.delivery_date}, {instance.get_delivery_time_display()}\n"
             f"Получатель: {instance.customer_name}, {instance.customer_phone}\n"
             f"Товар: {instance.product} × {instance.quantity}\n"
             f"Сумма: {instance.total_price} ₽"
