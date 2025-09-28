@@ -6,3 +6,4 @@ psycopg2-binary==2.9.*
 django-phonenumber-field==8.1.0
 phonenumbers==9.0.13
 pillow==11.2.1
+requests==2.32.5
