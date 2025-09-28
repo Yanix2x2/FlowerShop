@@ -75,8 +75,8 @@
       ```sh
       docker compose -f docker-compose-prod.yml exec web sh -lc 'python manage.py createsuperuser'
       ```
-Настройте Nginx указав пути к staticfiles и media (с учетом расположения проекта `opt/FloverShop/flower_store/`):
+Настройте Nginx указав пути к staticfiles и media (с учетом расположения проекта `opt/FlowerShop/flower_store/`):
 
-`opt/FloverShop/flower_store/staticfiles/`
+`opt/FlowerShop/flower_store/staticfiles/`
 
-`opt/FloverShop/flower_store/media/`
+`opt/FlowerShop/flower_store/media/`

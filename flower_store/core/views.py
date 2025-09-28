@@ -6,6 +6,13 @@ from .forms import ConsultationRequest
 from .models import Product, Order, Occasion
 
 
+def update_session_order(request, key, value):
+    order_data = request.session.get('order_data', {})
+    order_data[key] = value
+    request.session['order_data'] = order_data
+    request.session.modified = True
+
+
 def index(request):
     bouquets = Product.objects.filter(is_recommended=True)
 
@@ -33,6 +40,7 @@ def catalog(request):
 def bouquet_item(request, bouquet_id):
     bouquet = get_object_or_404(Product, id=bouquet_id)
     composition = bouquet.flower_composition.all()
+    update_session_order(request, 'bouquet_name', bouquet.name)
 
     if composition:
         flower_strings = []
@@ -42,6 +50,8 @@ def bouquet_item(request, bouquet_id):
         flowers_display = ', '.join(flower_strings)
     else:
         flowers_display = 'Состав не указан'
+
+    update_session_order(request, 'bouquet_id', bouquet_id)
 
     return render(
         request,
@@ -53,15 +63,21 @@ def bouquet_item(request, bouquet_id):
     )
 
 
-def catalog_collect(request, bouquet_id):
-    bouquet = get_object_or_404(Product, id=bouquet_id)
-    occasions = bouquet.occasions.all()
+def catalog_collect(request):
+    order_data = request.session.get('order_data', {})
+    occasion = order_data.get('order_occasion')
+    price_range = order_data.get('order_price_range')
 
-    bouquets = (
-        Product.objects
-        .filter(occasions__in=occasions)
-        .distinct()
-    )
+    bouquets = Product.objects.all()
+    if occasion:
+        bouquets = bouquets.filter(occasions__name__icontains=occasion)
+    if price_range:
+        if price_range == 'low':
+            bouquets = bouquets.filter(price__lte=1000)
+        elif price_range == 'medium':
+            bouquets = bouquets.filter(price__gt=1000, price__lte=5000)
+        elif price_range == 'high':
+            bouquets = bouquets.filter(price__gt=5000)
 
     return render(
         request,
@@ -100,12 +116,14 @@ def order_step_delivery(request, bouquet_id):
 def quiz_step(request):
     """Обработка квиза"""
     occasions = Occasion.objects.all()
-    
+
     if request.method == 'POST':
         occasion = request.POST.get('occasion')
         price_range = request.POST.get('price_range')
 
         if occasion and not price_range:
+            update_session_order(request, 'order_occasion', occasion)
+
             return render(request, 'quiz-step.html', {
                 'step': 2,
                 'occasion': occasion,
@@ -115,6 +133,9 @@ def quiz_step(request):
 
         if occasion and price_range:
             bouquets = Product.objects.all()
+
+            update_session_order(request, 'order_occasion', occasion)
+            update_session_order(request, 'order_price_range', price_range)
 
             if occasion and occasion != 'any':
                 bouquets = bouquets.filter(occasions__name__icontains=occasion)
@@ -142,10 +163,33 @@ def quiz_step(request):
 
 
 def consultation(request):
+    order_data = request.session.get('order_data', {})
+    occasion = order_data.get('order_occasion') or 'не выбрано'
+    price_range = order_data.get('order_price_range')
+    bouquet = order_data.get('bouquet_name') or 'не выбрано'
+    if price_range:
+        if price_range == 'low':
+            price_range = 'До 1000'
+        elif price_range == 'medium':
+            price_range = '1000 - 5000'
+        elif price_range == 'high':
+            price_range = 'От 5000'
+        else:
+            price_range = 'Не имеет значения'
+    else:
+        price_range = 'не выбрано'
+
+    comment = (
+        f"Событие: {occasion},\n"
+        f"Ценовой диапазон: {price_range},\n"
+        f"Букет: {bouquet}"
+    )
+
     if request.method == 'POST':
         ConsultationRequest.objects.create(
             customer_name=request.POST.get('fname'),
             customer_phone=request.POST.get('tel'),
+            comment=comment,
         )
         return redirect('core:index')
     return render(request, 'consultation.html')
