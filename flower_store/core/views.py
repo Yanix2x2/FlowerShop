@@ -148,12 +148,17 @@ def quiz_step(request):
                 elif price_range == 'high':
                     bouquets = bouquets.filter(price__gt=5000)
 
-            return render(request, 'catalog.html', {
-                'bouquets': bouquets,
-                'is_quiz_result': True,
-                'selected_occasion': occasion,
-                'selected_price': price_range
-            })
+            selected_bouquet = bouquets.order_by('?').first()
+
+            if not selected_bouquet:
+                return render(request, 'catalog.html', {
+                    'bouquets': bouquets,
+                    'is_quiz_result': True,
+                    'selected_occasion': occasion,
+                    'selected_price': price_range
+                })
+
+            return redirect('core:bouquet_item', bouquet_id=selected_bouquet.id)
 
     return render(request, 'quiz-step.html', {
         'step': 1,
