@@ -21,6 +21,7 @@ def order_paid_handler(sender, instance: Order, created, **kwargs):
         send_telegram_message(settings.TELEGRAM_GROUP_CHAT_ID, courier_text)
 
         instance.status = Order.OrderStatus.ASSIGNED
+        instance.save()
 
 
 @receiver(post_save, sender=ConsultationRequest)
