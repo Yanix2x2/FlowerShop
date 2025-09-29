@@ -30,7 +30,7 @@ def consultation_request_created(sender, instance: ConsultationRequest, created,
             f"💬 Новая заявка на консультацию!\n\n"
             f"Имя: {instance.customer_name}\n"
             f"Телефон: {instance.customer_phone}\n"
-            f"Комментарий: {instance.comment or '—'}"
+            f"Комментарий: \n{instance.comment or '—'}"
         )
         send_telegram_message(settings.TELEGRAM_GROUP_CHAT_ID, text)
 
