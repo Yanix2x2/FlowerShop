@@ -93,7 +93,10 @@ def order_step_delivery(request, bouquet_id):
         customer_name = request.POST.get('customer_name')
         customer_phone = request.POST.get('customer_phone')
         delivery_address = request.POST.get('delivery_address')
-        order_time = request.POST.get('orderTime')
+        delivery_time = request.POST.get('delivery_time') or 'any'
+        available_slots = {choice for choice, _ in Order.CHOICE}
+        if delivery_time not in available_slots:
+            delivery_time = 'any'
 
         product = Product.objects.get(pk=bouquet_id)
         order = Order.objects.create(
@@ -101,7 +104,7 @@ def order_step_delivery(request, bouquet_id):
             customer_phone=customer_phone,
             delivery_address=delivery_address,
             delivery_date=timezone.now().date(),
-            comment=order_time or "",
+            delivery_time=delivery_time,
             product=product,
             quantity=1,
         )
