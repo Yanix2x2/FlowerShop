@@ -103,9 +103,21 @@ class Product(models.Model):
         return f"{self.name} - {self.price} руб."
 
     def get_primary_occasion(self):
-        """Возвращает основной повод"""
         primary = self.productoccasion_set.filter(is_primary=True).first()
         return primary.occasion if primary else None
+
+    def get_customers(self):
+        orders = self.orders.select_related('customer_name', 'customer_phone', 'customer_email')
+        return [
+            {
+                'name': order.customer_name,
+                'phone': order.customer_phone,
+                'email': order.customer_email,
+                'order_date': order.created_at,
+                'quantity': order.quantity
+            }
+            for order in orders
+        ]
 
     def clean(self):
         super().clean()

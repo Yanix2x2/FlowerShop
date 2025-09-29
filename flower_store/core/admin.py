@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
+from django.urls import reverse
 
 from .models import (ConsultationRequest, Courier, Florist, Flower, Occasion,
                      Order, Product, ProductFlowerComposition, ProductOccasion)
@@ -38,7 +39,15 @@ class ProductFlowerCompositionInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'primary_occasion', 'image_preview', 'order_count', 'is_recommended']
+    list_display = [
+        'name',
+        'price',
+        'primary_occasion',
+        'image_preview',
+        'order_count',
+        'view_customers',
+        'is_recommended'
+    ]
     list_filter = ['occasions']
     list_editable = ["is_recommended"]
     search_fields = ['name', 'first_description']
@@ -71,6 +80,13 @@ class ProductAdmin(admin.ModelAdmin):
         return obj.orders.count()
 
     order_count.short_description = 'Заказов'
+
+    def view_customers(self, obj): 
+        count = obj.orders.count()
+        url = reverse('admin:core_order_changelist') + f'?product__id__exact={obj.id}'
+        return format_html('<a href="{}">{} клиентов</a>', url, count)
+
+    view_customers.short_description = 'Клиенты'
 
 
 @admin.register(Florist)
@@ -107,8 +123,8 @@ class OrderAdmin(admin.ModelAdmin):
         'id', 'customer_name', 'customer_phone', 'product',
         'quantity', 'total_price', 'status', 'created_at', 'delivery_time', 'courier'
     ]
-    list_filter = ['status', 'delivery_date', 'created_at']
-    search_fields = ['customer_name', 'customer_phone', 'delivery_address']
+    list_filter = ['status', 'delivery_date', 'created_at', 'product']
+    search_fields = ['customer_name', 'customer_phone', 'delivery_address', 'product__name']
     readonly_fields = ['created_at', 'total_price',]
     list_editable = ['status', 'delivery_time']
     fieldsets = (
